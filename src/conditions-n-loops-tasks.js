@@ -64,8 +64,12 @@ function getMaxNumber(a, b, c) {
  * {x: 1, y: 1}, {x: 2, y: 8} => false
  * {x: 1, y: 1}, {x: 2, y: 8} => false
  */
-function canQueenCaptureKing(/* queen, king */) {
-  throw new Error('Not implemented');
+function canQueenCaptureKing(queen, king) {
+  return (
+    queen.x === king.x ||
+    queen.y === king.y ||
+    Math.abs(queen.x - king.x) === Math.abs(queen.y - king.y)
+  );
 }
 
 /**
@@ -204,8 +208,15 @@ function convertNumberToString(numberStr) {
  *  '0123210'   => true
  *  'qweqwe'    => false
  */
-function isPalindrome(/* str */) {
-  throw new Error('Not implemented');
+function isPalindrome(str) {
+  let left = 0;
+  let right = str.length - 1;
+  while (right > left) {
+    if (str[left] !== str[right]) return false;
+    right -= 1;
+    left += 1;
+  }
+  return true;
 }
 
 /**
@@ -325,8 +336,26 @@ function getSpiralMatrix(/* size */) {
  *    [7, 8, 9]         [9, 6, 3]
  *  ]                 ]
  */
-function rotateMatrix(/* matrix */) {
-  throw new Error('Not implemented');
+function rotateMatrix(matrix) {
+  const newMat = matrix;
+
+  for (let i = 0; i < newMat.length / 2; i += 1) {
+    for (let k = i; k < newMat.length - 1 - i; k += 1) {
+      [
+        newMat[i][k],
+        newMat[newMat.length - 1 - k][i],
+        newMat[newMat.length - 1 - i][newMat.length - 1 - k],
+        newMat[k][newMat.length - 1 - i],
+      ] = [
+        newMat[newMat.length - 1 - k][i],
+        newMat[newMat.length - 1 - i][newMat.length - 1 - k],
+        newMat[k][newMat.length - 1 - i],
+        newMat[i][k],
+      ];
+    }
+  }
+
+  return newMat;
 }
 
 /**
@@ -343,8 +372,34 @@ function rotateMatrix(/* matrix */) {
  *  [2, 9, 5, 9]    => [2, 5, 9, 9]
  *  [-2, 9, 5, -3]  => [-3, -2, 5, 9]
  */
-function sortByAsc(/* arr */) {
-  throw new Error('Not implemented');
+function sortByAsc(arr) {
+  const arrNew = arr;
+  function quickSort(left, right) {
+    if (left >= right) return;
+
+    const pivot = arrNew[Math.floor((left + right) / 2)];
+    let i = left;
+    let j = right;
+
+    while (i <= j) {
+      while (arrNew[i] < pivot) i += 1;
+      while (arrNew[j] > pivot) j -= 1;
+
+      if (i <= j) {
+        const tmp = arrNew[i];
+        arrNew[i] = arrNew[j];
+        arrNew[j] = tmp;
+        i += 1;
+        j -= 1;
+      }
+    }
+
+    quickSort(left, j);
+    quickSort(i, right);
+  }
+
+  quickSort(0, arr.length - 1);
+  return arr;
 }
 
 /**
@@ -364,10 +419,30 @@ function sortByAsc(/* arr */) {
  *  '012345', 3 => '024135' => '043215' => '031425'
  *  'qwerty', 3 => 'qetwry' => 'qtrewy' => 'qrwtey'
  */
-function shuffleChar(/* str, iterations */) {
-  throw new Error('Not implemented');
-}
+function shuffleChar(str, iterations) {
+  if (iterations <= 0) return str;
 
+  let res = str;
+  const cache = {};
+
+  for (let k = 0; k < iterations; k += 1) {
+    if (cache[res] !== undefined) {
+      const cycle = k - cache[res];
+      const remaining = (iterations - k) % cycle;
+      k = iterations - remaining;
+    }
+
+    cache[res] = k;
+
+    let newStr = '';
+    for (let i = 0; i < res.length; i += 2) newStr += res[i];
+    for (let i = 1; i < res.length; i += 2) newStr += res[i];
+
+    res = newStr;
+  }
+
+  return res;
+}
 /**
  * Returns the nearest largest integer consisting of the digits of the given positive integer.
  * If there is no such number, it returns the original number.
